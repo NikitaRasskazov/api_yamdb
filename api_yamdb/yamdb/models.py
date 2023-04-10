@@ -1,4 +1,7 @@
+from datetime import datetime
+
 from django.db import models
+from django.core.validators import MaxValueValidator, MinValueValidator
 
 
 class Category(models.Model):
@@ -19,11 +22,19 @@ class Genre(models.Model):
 
 class Title(models.Model):
     name = models.CharField(max_length=200)
-    year = models.DateTimeField()  # во views -> year.year или сделать через IntegerField
+    year = models.IntegerField(
+        validators=[
+            MinValueValidator(1455, message='Год не может быть менее 1455'),
+            MaxValueValidator(
+                datetime.now().year,
+                message='Год не может быть больше текущего'
+            )
+        ],
+    )
     category = models.ForeignKey(
         Category,
         related_name='titles',
-        on_delete=models.SET_NULL(),
+        on_delete=models.SET_NULL,
         blank=True,
         null=True,
     )
