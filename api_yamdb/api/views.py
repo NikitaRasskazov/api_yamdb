@@ -1,6 +1,6 @@
 from rest_framework import viewsets
 
-from yambd.models import Genre
+from yamdb.models import Genre
 from .serializers import GenreSerializer
 
 
