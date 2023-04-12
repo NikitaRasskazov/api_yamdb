@@ -1,7 +1,13 @@
 from rest_framework import viewsets
 
-from yamdb.models import Genre
-from .serializers import GenreSerializer
+from yamdb.models import Category, Genre
+from .serializers import CategorySerializer, GenreSerializer
+
+
+class CategoryViewSet(viewsets.ModelViewSet):
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    permission_classes = ()
 
 
 class GenreViewSet(viewsets.ModelViewSet):
