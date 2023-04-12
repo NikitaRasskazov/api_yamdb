@@ -24,12 +24,17 @@ class Title(models.Model):
     name = models.CharField(max_length=200)
     year = models.IntegerField(
         validators=[
-            MinValueValidator(1455, message='Год не может быть менее 1455'),
+            MinValueValidator(1, message='Год должен быть натуральным числом'),
             MaxValueValidator(
                 datetime.now().year,
                 message='Год не может быть больше текущего'
             )
         ],
+    )
+    description = models.CharField(
+        max_length=2000,
+        null=True,
+        blank=True
     )
     category = models.ForeignKey(
         Category,
