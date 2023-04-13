@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from yamdb.models import Category, Genre, Title
+from yamdb.models import Category, Genre, Title, Review
 
 
 class CategorySerializer(serializers.ModelSerializer):
@@ -38,3 +38,9 @@ class TitleCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Title
         fields = ('id', 'name', 'year', 'description', 'genre', 'category')
+
+
+class ReviewSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Review
+        fields = '__all__'

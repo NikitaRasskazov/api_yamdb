@@ -3,6 +3,9 @@ from datetime import datetime
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 
+LEN_STR_TEXT = 20
+MAX_LENGTH_REVIEW = 200
+
 
 class Category(models.Model):
     name = models.CharField(max_length=200)
@@ -61,3 +64,23 @@ class GenreTitle(models.Model):
         Title,
         on_delete=models.CASCADE,
     )
+
+
+class Review(models.Model):
+    author = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='reviews'
+    )
+    pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
+    text = models.CharField(
+        max_length=200
+    )
+    title = models.ForeignKey(
+        Title,
+        on_delete=models.CASCADE,
+        related_name='reviews'
+    )
+
+    def __str__(self):
+        return self.text[:LEN_STR_TEXT]
