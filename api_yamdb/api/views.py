@@ -1,7 +1,7 @@
 from rest_framework import viewsets
 from django.shortcuts import get_object_or_404
 
-from yamdb.models import Category, Genre, Title, Review
+from yamdb.models import Category, Genre, Title
 from .serializers import (
     CategorySerializer,
     GenreSerializer,
