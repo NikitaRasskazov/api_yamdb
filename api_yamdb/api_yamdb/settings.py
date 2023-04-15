@@ -17,6 +17,7 @@ ALLOWED_HOSTS = ['*']
 INSTALLED_APPS = [
     'api.apps.ApiConfig',
     'yamdb.apps.YamdbConfig',
+    'rest_framework',
     'django_filters',
     'django.contrib.admin',
     'django.contrib.auth',
@@ -24,6 +25,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'users',
+    'rest_framework_simplejwt'
 ]
 
 MIDDLEWARE = [
@@ -35,6 +38,8 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
+
+AUTH_USER_MODEL = 'users.User'
 
 ROOT_URLCONF = 'api_yamdb.urls'
 
@@ -107,4 +112,13 @@ STATICFILES_DIRS = ((BASE_DIR / 'static/'),)
 
 REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': ['django_filters.rest_framework.DjangoFilterBackend'],
+    'DEFAULT_AUTHENTICATION_CLASSES': (
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
+    )
 }
+
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'yamdb.ibra@gmail.com'
+EMAIL_HOST_PASSWORD = 'a3g5m7t9'
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
