@@ -18,8 +18,8 @@ API для YaMDb.
 Клонировать репозиторий и перейти в него в командной строке:
 
 ```
-git clone https://github.com/vzbdr/api_final_yatube.git
-cd yatube_api
+git clone https://github.com/NikitaRasskazov/api_yamdb.git
+cd api_yambd
 ```
 
 Cоздать и активировать виртуальное окружение:
@@ -48,15 +48,11 @@ python3 manage.py migrate
 python3 manage.py runserver
 ```
 
-```
-http://127.0.0.1:8000/redoc/
-```
-
 
 ## Документация
 
 Документация проекта представлена в формате Redoc.
 
 ```
-http://127.0.0.1:8000/redoc/`
+http://127.0.0.1:8000/redoc/
 ```
