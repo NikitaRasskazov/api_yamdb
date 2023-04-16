@@ -1,11 +1,12 @@
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, filters
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import action
-from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from .models import User
 from .serializers import UserSerializer, UserSignupSerializer, UserTokenSerializer
+from .permissions import IsAdmin
 
 
 class UserSignupView(APIView):
@@ -32,19 +33,20 @@ class UserViewSet(viewsets.ModelViewSet):
 
     queryset = User.objects.all()
     serializer_class = UserSerializer
-    
-    def get_serializer_class(self):
-        if self.action == 'me':
-            return UserSerializer
-        return super().get_serializer_class()
+    permission_classes = [IsAdmin]
+    filter_backends = [filters.SearchFilter]
+    lookup_field = "username"
+    search_fields = ('username',) 
+    http_method_names = ['get', 'post', 'patch', 'delete']
 
-    @action(methods=['get', 'patch'], detail=True)
+    @action(methods=["GET", "PATCH"], detail=False, permission_classes=[IsAuthenticated])
     def me(self, request):
         serializer = self.get_serializer_class()
         user = get_object_or_404(User, username=request.user.username)
         if self.request.method == 'PATCH':
             serializer = serializer(user, request.data, partial=True)
             if serializer.is_valid():
+                serializer.validated_data['role'] = request.user.role
                 serializer.save()
                 return Response(
                     serializer.data,
@@ -56,3 +58,11 @@ class UserViewSet(viewsets.ModelViewSet):
             )
         serializer = serializer(user)
         return Response(serializer.data, status=status.HTTP_200_OK) 
+    
+    def destroy(self, request, pk=None, *args, **kwargs):
+        if pk == 'me':
+            user = request.user
+        else:
+            user = self.get_object()
+        user.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

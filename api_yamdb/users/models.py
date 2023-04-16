@@ -33,8 +33,18 @@ class User(AbstractUser):
     # class Meta:
     #     constraints = [
     #         models.UniqueConstraint(
-    #             fields=['username', 'email'],
-    #             name='unique_user')
+    #             fields=['username', 'email'], name='unique_user')
     #     ]
+
+    def __str__(self):
+        return self.username
+
+    @property
+    def is_admin(self):
+        return self.is_superuser or self.role == "admin"
+
+    @property
+    def is_moder(self):
+        return self.role == 'moderator'
 
 
