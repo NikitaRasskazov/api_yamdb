@@ -2,6 +2,7 @@ from rest_framework import viewsets, status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework.decorators import action
+from rest_framework.pagination import PageNumberPagination
 from django.shortcuts import get_object_or_404
 from .models import User
 from .serializers import UserSerializer, UserSignupSerializer, UserTokenSerializer
@@ -14,7 +15,7 @@ class UserSignupView(APIView):
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
-        return Response(status=status.HTTP_201_CREATED)
+        return Response(serializer.data)
 
 
 class UserTokenView(APIView):
@@ -31,6 +32,11 @@ class UserViewSet(viewsets.ModelViewSet):
 
     queryset = User.objects.all()
     serializer_class = UserSerializer
+    
+    def get_serializer_class(self):
+        if self.action == 'me':
+            return UserSerializer
+        return super().get_serializer_class()
 
     @action(methods=['get', 'patch'], detail=True)
     def me(self, request):
