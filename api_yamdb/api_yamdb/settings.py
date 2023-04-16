@@ -1,5 +1,5 @@
 from pathlib import Path
-
+import os
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -124,3 +124,5 @@ EMAIL_HOST_USER = 'yamdb.ibra@gmail.com'
 EMAIL_HOST_PASSWORD = 'a3g5m7t9'
 # EMAIL_PORT = 587
 # EMAIL_USE_TLS = True
+EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails') 

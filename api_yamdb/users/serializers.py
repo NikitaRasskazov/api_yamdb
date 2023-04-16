@@ -4,7 +4,18 @@ from django.contrib.auth.tokens import default_token_generator
 from django.core.mail import send_mail
 from rest_framework_simplejwt.tokens import RefreshToken
 
+
+class MaxValueValidator:
+    def __init__(self, max_value):
+        self.max_value = max_value
+
+    def __call__(self, value):
+        if value > self.max_value:
+            raise serializers.ValidationError(f'Maximum value is {self.max_value}.')
+
+
 class UserSignupSerializer(serializers.Serializer):
+    """Сериализатор для регистрации пользователя."""
     email = serializers.EmailField()
     username = serializers.CharField(max_length=150)
 
@@ -15,8 +26,8 @@ class UserSignupSerializer(serializers.Serializer):
             is_active=False
         )
         confirmation_code = default_token_generator.make_token(user)
-        subject = 'Confirm your email address'
-        message = f'Please use the following confirmation code to activate your account: {confirmation_code}'
+        subject = 'Подтвердение email-адреса'
+        message = f'Пожалуйста, используйте следующий код подтверждения для активации вашей учетной записи: {confirmation_code}'
         send_mail(
             subject=subject,
             message=message,
@@ -30,6 +41,8 @@ class UserSignupSerializer(serializers.Serializer):
 class UserSerializer(serializers.ModelSerializer):
     """Сериализатор для пользователей."""
     role = serializers.ChoiceField(choices=ROLE_CHOICES, default='user')
+    last_name = serializers.CharField(validators=[MaxValueValidator(150)])
+
 
     class Meta:
         fields = ('username', 'email', 'first_name', 'last_name', 'bio', 'role')
@@ -37,6 +50,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 
 class UserTokenSerializer(serializers.Serializer):
+    """Сериализатор для подтверждения email-адреса."""
     username = serializers.CharField(max_length=150)
     confirmation_code = serializers.CharField()
 
@@ -44,21 +58,17 @@ class UserTokenSerializer(serializers.Serializer):
         username = attrs.get('username')
         confirmation_code = attrs.get('confirmation_code')
 
-        # Find user by username
         try:
             user = User.objects.get(username=username, is_active=False)
         except User.DoesNotExist:
-            raise serializers.ValidationError('Invalid username or confirmation code.')
+            raise serializers.ValidationError('Ошибочное имя пользователя или код верификации.')
 
-        # Verify confirmation code
         if not default_token_generator.check_token(user, confirmation_code):
-            raise serializers.ValidationError('Invalid username or confirmation code.')
+            raise serializers.ValidationError('Ошибочное имя пользователя или код верификации.')
 
-        # Activate user account
         user.is_active = True
         user.save()
 
-        # Authenticate user and generate JWT token
         refresh = RefreshToken.for_user(user)
         token = str(refresh.access_token)
 
