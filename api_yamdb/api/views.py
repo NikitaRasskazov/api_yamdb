@@ -1,28 +1,53 @@
+from django_filters.rest_framework import (
+    DjangoFilterBackend, FilterSet, CharFilter, NumberFilter
+)
 from rest_framework import viewsets
+from rest_framework.filters import SearchFilter
+from rest_framework.pagination import PageNumberPagination
 
 from yamdb.models import Category, Genre, Title
-from .serializers import CategorySerializer, GenreSerializer, TitleSerializer, TitleCreateSerializer
+from .serializers import (
+    CategorySerializer, GenreSerializer, TitleSerializer, TitleCreateSerializer
+)
+from .mixins import CustomViewSet
 
 
-class CategoryViewSet(viewsets.ModelViewSet):
+class CategoryViewSet(CustomViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = ()
+    pagination_class = PageNumberPagination
+    filter_backends = (SearchFilter, )
+    search_fields = ('name', )
+    lookup_field = 'slug'
 
 
-class GenreViewSet(viewsets.ModelViewSet):
+class GenreViewSet(CustomViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    permission_classes = ()
+    pagination_class = PageNumberPagination
+    filter_backends = (SearchFilter, )
+    search_fields = ('name', )
+    lookup_field = 'slug'
+
+
+class TitleFilterSet(FilterSet):
+    genre = CharFilter(field_name='genre__slug')
+    category = CharFilter(field_name='category__slug')
+    name = CharFilter()
+    year = NumberFilter()
+
+    class Meta:
+        model = Title
+        fields = []
 
 
 class TitleViewSet(viewsets.ModelViewSet):
     queryset = Title.objects.all()
     serializer_class = TitleSerializer
-    permission_classes = ()
-    filterset_fields = ['category__slug', 'genre__slug', 'name', 'year']
+    filter_backends = (DjangoFilterBackend,)
+    filterset_class = TitleFilterSet
 
     def get_serializer_class(self):
-        if self.action == 'create' or self.action == 'update':
+        if self.action in ('create', 'update', 'partial_update'):
             return TitleCreateSerializer
         return TitleSerializer

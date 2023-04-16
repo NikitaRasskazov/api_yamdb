@@ -116,8 +116,13 @@ REST_FRAMEWORK = {
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE': 5,
+    'PAGE_SIZE': 10,
 }
 
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'yamdb.ibra@gmail.com'
+EMAIL_HOST_PASSWORD = 'a3g5m7t9'
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
 EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
 EMAIL_FILE_PATH = os.path.join(BASE_DIR, 'sent_emails') 
