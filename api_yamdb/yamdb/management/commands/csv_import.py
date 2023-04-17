@@ -58,7 +58,9 @@ class Command(BaseCommand):
             self.stdout.write('Данные уже существуют в GenreTitle')
         else:
             for row in DictReader(
-                    open('./static/data/genre_title.csv', 'r', encoding='utf-8')
+                    open(
+                        './static/data/genre_title.csv', 'r', encoding='utf-8'
+                    )
             ):
                 genre_title = GenreTitle.objects.create(
                     id=row['id'],

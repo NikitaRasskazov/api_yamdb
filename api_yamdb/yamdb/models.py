@@ -7,26 +7,29 @@ from users.models import User
 
 LEN_STR_TEXT = 20
 MAX_LENGTH_REVIEW = 200
+MAX_LENGTH_NAME = 256
+MAX_LENGTH_SLUG = 50
+MAX_LENGTH_DESCRIPTION = 2000
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=256)
-    slug = models.SlugField(unique=True, max_length=50)
+    name = models.CharField(max_length=MAX_LENGTH_NAME)
+    slug = models.SlugField(unique=True, max_length=MAX_LENGTH_SLUG)
 
     def __str__(self):
-        return self.name
+        return self.name[:LEN_STR_TEXT]
 
 
 class Genre(models.Model):
-    name = models.CharField(max_length=256)
-    slug = models.SlugField(unique=True, max_length=50)
+    name = models.CharField(max_length=MAX_LENGTH_NAME)
+    slug = models.SlugField(unique=True, max_length=MAX_LENGTH_SLUG)
 
     def __str__(self):
-        return self.name
+        return self.name[:LEN_STR_TEXT]
 
 
 class Title(models.Model):
-    name = models.CharField(max_length=256)
+    name = models.CharField(max_length=MAX_LENGTH_NAME)
     year = models.IntegerField(
         validators=[
             MinValueValidator(1, message='Год должен быть натуральным числом'),
@@ -37,7 +40,7 @@ class Title(models.Model):
         ],
     )
     description = models.CharField(
-        max_length=2000,
+        max_length=MAX_LENGTH_DESCRIPTION,
         null=True,
         blank=True
     )
@@ -54,7 +57,7 @@ class Title(models.Model):
     )
 
     def __str__(self):
-        return self.name
+        return self.name[:LEN_STR_TEXT]
 
 
 class GenreTitle(models.Model):

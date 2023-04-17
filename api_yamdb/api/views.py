@@ -17,6 +17,7 @@ from .serializers import (
     ReviewSerializer,
 )
 from .mixins import CustomViewSet
+from .permissions import IsAdminOrReadOnly
 
 
 class CategoryViewSet(CustomViewSet):
@@ -26,6 +27,7 @@ class CategoryViewSet(CustomViewSet):
     filter_backends = (SearchFilter, )
     search_fields = ('name', )
     lookup_field = 'slug'
+    permission_classes = (IsAdminOrReadOnly, )
 
 
 class GenreViewSet(CustomViewSet):
@@ -35,6 +37,7 @@ class GenreViewSet(CustomViewSet):
     filter_backends = (SearchFilter, )
     search_fields = ('name', )
     lookup_field = 'slug'
+    permission_classes = (IsAdminOrReadOnly, )
 
 
 class TitleFilterSet(FilterSet):
@@ -55,6 +58,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     serializer_class = TitleSerializer
     filter_backends = (DjangoFilterBackend,)
     filterset_class = TitleFilterSet
+    permission_classes = (IsAdminOrReadOnly, )
 
     def get_serializer_class(self):
         if self.action in ('create', 'update', 'partial_update'):
