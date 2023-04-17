@@ -1,5 +1,6 @@
 from rest_framework import viewsets
 from django.shortcuts import get_object_or_404
+from django.db.models import Avg
 
 from yamdb.models import Category, Genre, Title, Review
 from .serializers import (
@@ -25,7 +26,9 @@ class GenreViewSet(viewsets.ModelViewSet):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
-    queryset = Title.objects.all()
+    queryset = Title.objects.annotate(
+        rating=Avg('reviews__score')
+    ).all()
     serializer_class = TitleSerializer
     permission_classes = ()
     filterset_fields = ['category__slug', 'genre__slug', 'name', 'year']

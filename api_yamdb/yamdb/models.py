@@ -83,6 +83,21 @@ class Review(models.Model):
         on_delete=models.CASCADE,
         related_name='reviews'
     )
+    score = models.IntegerField(
+        'оценка',
+        validators=(
+            MinValueValidator(1),
+            MaxValueValidator(10)
+        ),
+        error_messages={'validators': 'Поставьте оценку от 1 до 10!'}
+    )
+
+    class Meta:
+        constraints = [
+            models.UniqueConstraint(
+                fields=('title', 'author', ),
+                name='unique review'
+            )]
 
     def __str__(self):
         return self.text[:LEN_STR_TEXT]
