@@ -2,9 +2,9 @@ from datetime import datetime
 
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
-from django.contrib.auth import get_user_model
 
-User = get_user_model()
+from users.models import User
+
 LEN_STR_TEXT = 20
 MAX_LENGTH_REVIEW = 200
 

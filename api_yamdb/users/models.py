@@ -3,10 +3,10 @@ from django.db import models
 
 
 ROLE_CHOICES = [
-        ('user', 'Пользователь'),
-        ('moderator', 'Модератор'),
-        ('admin', 'Администратор'),
-    ]
+    ('user', 'Пользователь'),
+    ('moderator', 'Модератор'),
+    ('admin', 'Администратор'),
+]
 
 
 class User(AbstractUser):
@@ -46,5 +46,3 @@ class User(AbstractUser):
     @property
     def is_moder(self):
         return self.role == 'moderator'
-
-

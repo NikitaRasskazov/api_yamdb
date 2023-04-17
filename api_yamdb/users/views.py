@@ -5,7 +5,11 @@ from rest_framework.decorators import action
 from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from .models import User
-from .serializers import UserSerializer, UserSignupSerializer, UserTokenSerializer
+from .serializers import (
+    UserSerializer,
+    UserSignupSerializer,
+    UserTokenSerializer
+)
 from .permissions import IsAdmin
 
 
@@ -36,10 +40,14 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = [IsAdmin]
     filter_backends = [filters.SearchFilter]
     lookup_field = "username"
-    search_fields = ('username',) 
+    search_fields = ('username',)
     http_method_names = ['get', 'post', 'patch', 'delete']
 
-    @action(methods=["GET", "PATCH"], detail=False, permission_classes=[IsAuthenticated])
+    @action(
+        methods=["GET", "PATCH"],
+        detail=False,
+        permission_classes=[IsAuthenticated]
+    )
     def me(self, request):
         serializer = self.get_serializer_class()
         user = get_object_or_404(User, username=request.user.username)
@@ -57,8 +65,8 @@ class UserViewSet(viewsets.ModelViewSet):
                 status=status.HTTP_400_BAD_REQUEST
             )
         serializer = serializer(user)
-        return Response(serializer.data, status=status.HTTP_200_OK) 
-    
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
     def destroy(self, request, pk=None, *args, **kwargs):
         if pk == 'me':
             user = request.user

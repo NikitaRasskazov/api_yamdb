@@ -9,14 +9,12 @@ from django.db.models import Avg
 
 from yamdb.models import Category, Genre, Title, Review
 from .serializers import (
-    (
     CategorySerializer,
     GenreSerializer,
     TitleSerializer,
     TitleCreateSerializer,
     CommentSerializer,
     ReviewSerializer,
-)
 )
 from .mixins import CustomViewSet
 
