@@ -79,7 +79,7 @@ class CommentSerializer(serializers.ModelSerializer):
         read_only=True
     )
     author = serializers.SlugRelatedField(
-        slug_field='user',
+        slug_field='username',
         read_only=True
     )
 
