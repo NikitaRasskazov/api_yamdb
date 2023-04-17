@@ -2,7 +2,7 @@ from rest_framework.permissions import BasePermission
 
 
 class IsAdmin(BasePermission):
-
+    """Проверка роли администратора."""
     def has_permission(self, request, view):
 
         user = request.user
