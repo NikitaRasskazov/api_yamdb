@@ -30,12 +30,6 @@ class User(AbstractUser):
         default='user',
     )
 
-    # class Meta:
-    #     constraints = [
-    #         models.UniqueConstraint(
-    #             fields=['username', 'email'], name='unique_user')
-    #     ]
-
     def __str__(self):
         return self.username
 

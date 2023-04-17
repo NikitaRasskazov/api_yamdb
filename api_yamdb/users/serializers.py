@@ -9,6 +9,41 @@ from django.db.models import Q
 from django.shortcuts import get_object_or_404
 
 
+class UserSerializer(serializers.ModelSerializer):
+    """Сериализатор для управления пользователями."""
+    role = serializers.ChoiceField(
+        choices=ROLE_CHOICES,
+        default='user',
+        required=False
+    )
+    last_name = serializers.CharField(max_length=150, required=False)
+    username = serializers.RegexField(
+        max_length=150,
+        regex=r'^[\w.@+-]+$',
+        error_messages={
+            'invalid': 'Это имя пользователя может содержать'
+                       'только буквы, цифры и символы @.+-_'
+        }
+    )
+
+    class Meta:
+        fields = (
+            'username',
+            'email',
+            'first_name',
+            'last_name',
+            'bio',
+            'role'
+        )
+        model = User
+        validators = [
+            UniqueTogetherValidator(
+                queryset=User.objects.all(),
+                fields=['username']
+            )
+        ]
+
+
 class UserSignupSerializer(serializers.Serializer):
     """Сериализатор для регистрации пользователя."""
     email = serializers.EmailField(max_length=254)
@@ -16,7 +51,8 @@ class UserSignupSerializer(serializers.Serializer):
         max_length=150,
         regex=r'^[\w.@+-]+$',
         error_messages={
-            'invalid': 'Это имя пользователя может содержать только буквы, цифры'
+            'invalid': 'Это имя пользователя может содержать'
+                       'только буквы, цифры'
                        'и символы @.+-_'
         }
     )
@@ -25,8 +61,13 @@ class UserSignupSerializer(serializers.Serializer):
 
         email = data['email']
         username = data['username']
-        if User.objects.filter(email=email).exists() and not User.objects.filter(username=username).exists():
-            raise serializers.ValidationError('Пользователь с таким email уже зарегистрирован.')
+        if (
+            User.objects.filter(email=email).exists()
+            and not User.objects.filter(username=username).exists()
+        ):
+            raise serializers.ValidationError(
+                'Пользователь с таким email уже зарегистрирован.'
+            )
 
         if User.objects.filter(username=username).exists():
             user = User.objects.get(username=username)
@@ -35,67 +76,34 @@ class UserSignupSerializer(serializers.Serializer):
 
         if username != 'me':
             return data
-        raise serializers.ValidationError('Имя "me" недоступно для применения.')
-    
+        raise serializers.ValidationError(
+            'Имя "me" недоступно для применения.'
+        )
+
     def create(self, validated_data):
         try:
-            user = User.objects.get(Q(email=validated_data['email']) | Q(username=validated_data['username']))
-            
-            confirmation_code = default_token_generator.make_token(user)
-            subject = 'Подтверждение email-адреса'
-            message = f'Пожалуйста, используйте следующий код подтверждения для активации вашей учетной записи: {confirmation_code}'
-            send_mail(
-                subject=subject,
-                message=message,
-                from_email=None,
-                recipient_list=[validated_data['email']],
-                fail_silently=False,
+            user = User.objects.get(
+                Q(email=validated_data['email'])
+                | Q(username=validated_data['username'])
             )
-            
-            return user
-
-
         except ObjectDoesNotExist:
             user = User.objects.create(
                 email=validated_data['email'],
                 username=validated_data['username'],
                 is_active=False
             )
-            confirmation_code = default_token_generator.make_token(user)
-            subject = 'Подтверждение email-адреса'
-            message = f'Пожалуйста, используйте следующий код подтверждения для активации вашей учетной записи: {confirmation_code}'
-            send_mail(
-                subject=subject,
-                message=message,
-                from_email=None,
-                recipient_list=[validated_data['email']],
-                fail_silently=False,
-            )
-            return user
-
-
-class UserSerializer(serializers.ModelSerializer):
-    """Сериализатор для пользователей."""
-    role = serializers.ChoiceField(choices=ROLE_CHOICES, default='user', required=False)
-    last_name = serializers.CharField(max_length=150, required=False)
-    username = serializers.RegexField(
-        max_length=150,
-        regex=r'^[\w.@+-]+$',
-        error_messages={
-            'invalid': 'Это имя пользователя может содержать только буквы, цифры'
-                       'и символы @.+-_'
-        }
-    )
-
-    class Meta:
-        fields = ('username', 'email', 'first_name', 'last_name', 'bio', 'role')
-        model = User
-        validators = [
-            UniqueTogetherValidator(
-                queryset=User.objects.all(),
-                fields=['username']
-            )
-        ]
+        confirmation_code = default_token_generator.make_token(user)
+        subject = 'Подтверждение email-адреса'
+        message = (f'Пожалуйста, используйте этот код подтверждения для '
+                   f'активации вашей учетной записи: {confirmation_code}')
+        send_mail(
+            subject=subject,
+            message=message,
+            from_email=None,
+            recipient_list=[validated_data['email']],
+            fail_silently=False,
+        )
+        return user
 
 
 class UserTokenSerializer(serializers.Serializer):
@@ -110,7 +118,9 @@ class UserTokenSerializer(serializers.Serializer):
         user = get_object_or_404(User, username=username)
 
         if not default_token_generator.check_token(user, confirmation_code):
-            raise serializers.ValidationError('Ошибочное имя пользователя или код верификации.')
+            raise serializers.ValidationError(
+                'Ошибочное имя пользователя или код верификации.'
+            )
 
         user.is_active = True
         user.save()
