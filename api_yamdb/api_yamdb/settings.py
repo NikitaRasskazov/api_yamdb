@@ -16,18 +16,18 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
-    'api.apps.ApiConfig',
-    'yamdb.apps.YamdbConfig',
-    'rest_framework',
-    'django_filters',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'users',
-    'rest_framework_simplejwt'
+    'rest_framework_simplejwt',
+    'api.apps.ApiConfig',
+    'yamdb.apps.YamdbConfig',
+    'reviews.apps.ReviewsConfig',
+    'rest_framework',
+    'django_filters',
 ]
 
 MIDDLEWARE = [
@@ -40,7 +40,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-AUTH_USER_MODEL = 'users.User'
+AUTH_USER_MODEL = 'reviews.User'
 
 ROOT_URLCONF = 'api_yamdb.urls'
 

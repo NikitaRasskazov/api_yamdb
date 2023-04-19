@@ -2,14 +2,56 @@ from datetime import datetime
 
 from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
-
-from users.models import User
+from django.contrib.auth.models import AbstractUser
 
 LEN_STR_TEXT = 20
-MAX_LENGTH_REVIEW = 200
+MAX_LENGTH_TEXT = 200
 MAX_LENGTH_NAME = 256
 MAX_LENGTH_SLUG = 50
+MAX_LENGTH_USERNAME = 150
 MAX_LENGTH_DESCRIPTION = 2000
+MAX_LENGTH_ROLE = 15
+MIN_SCORE = 1
+MAX_SCORE = 10
+
+ROLE_CHOICES = [
+    ('user', 'Пользователь'),
+    ('moderator', 'Модератор'),
+    ('admin', 'Администратор'),
+]
+
+
+class User(AbstractUser):
+    bio = models.TextField(
+        'Биография',
+        blank=True
+    )
+    username = models.CharField(
+        'Логин',
+        max_length=MAX_LENGTH_USERNAME,
+        unique=True,
+    )
+    email = models.EmailField(
+        'Email',
+        unique=True,
+    )
+    role = models.CharField(
+        'Роль',
+        max_length=MAX_LENGTH_ROLE,
+        choices=ROLE_CHOICES,
+        default='user',
+    )
+
+    def __str__(self):
+        return self.username
+
+    @property
+    def is_admin(self):
+        return self.is_superuser or self.role == "admin"
+
+    @property
+    def is_moder(self):
+        return self.role == 'moderator'
 
 
 class Category(models.Model):
@@ -79,7 +121,7 @@ class Review(models.Model):
     )
     pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
     text = models.CharField(
-        max_length=200
+        max_length=MAX_LENGTH_TEXT
     )
     title = models.ForeignKey(
         Title,
@@ -89,8 +131,8 @@ class Review(models.Model):
     score = models.IntegerField(
         'оценка',
         validators=(
-            MinValueValidator(1),
-            MaxValueValidator(10)
+            MinValueValidator(MIN_SCORE),
+            MaxValueValidator(MAX_SCORE)
         ),
         error_messages={'validators': 'Поставьте оценку от 1 до 10!'}
     )
@@ -98,7 +140,7 @@ class Review(models.Model):
     class Meta:
         constraints = [
             models.UniqueConstraint(
-                fields=('title', 'author', ),
+                fields=('title', 'author',),
                 name='unique review'
             )]
 
@@ -114,7 +156,7 @@ class Comment(models.Model):
     )
     pub_date = models.DateTimeField('Дата публикации', auto_now_add=True)
     text = models.CharField(
-        max_length=200
+        max_length=MAX_LENGTH_TEXT
     )
     review = models.ForeignKey(
         Review,
