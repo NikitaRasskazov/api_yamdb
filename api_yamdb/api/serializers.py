@@ -16,8 +16,13 @@ from reviews.models import (
     Review,
     Comment,
     User,
-    ROLE_CHOICES
+    ROLE_CHOICES,
+    MIN_SCORE,
+    MAX_SCORE,
+    MAX_LENGTH_USERNAME,
 )
+
+MAX_LENGTH_EMAIL = 254
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -27,9 +32,12 @@ class UserSerializer(serializers.ModelSerializer):
         default='user',
         required=False
     )
-    last_name = serializers.CharField(max_length=150, required=False)
+    last_name = serializers.CharField(
+        max_length=MAX_LENGTH_USERNAME,
+        required=False
+    )
     username = serializers.RegexField(
-        max_length=150,
+        max_length=MAX_LENGTH_USERNAME,
         regex=r'^[\w.@+-]+$',
         error_messages={
             'invalid': 'Это имя пользователя может содержать'
@@ -57,9 +65,9 @@ class UserSerializer(serializers.ModelSerializer):
 
 class UserSignupSerializer(serializers.Serializer):
     """Сериализатор для регистрации пользователя."""
-    email = serializers.EmailField(max_length=254)
+    email = serializers.EmailField(max_length=MAX_LENGTH_EMAIL)
     username = serializers.RegexField(
-        max_length=150,
+        max_length=MAX_LENGTH_USERNAME,
         regex=r'^[\w.@+-]+$',
         error_messages={
             'invalid': 'Это имя пользователя может содержать'
@@ -119,7 +127,7 @@ class UserSignupSerializer(serializers.Serializer):
 
 class UserTokenSerializer(serializers.Serializer):
     """Сериализатор для подтверждения email-адреса."""
-    username = serializers.CharField(max_length=150)
+    username = serializers.CharField(max_length=MAX_LENGTH_USERNAME)
     confirmation_code = serializers.CharField()
 
     def validate(self, attrs):
@@ -188,8 +196,8 @@ class ReviewSerializer(serializers.ModelSerializer):
     )
     score = serializers.IntegerField(
         validators=(
-            MinValueValidator(1),
-            MaxValueValidator(10)
+            MinValueValidator(MIN_SCORE),
+            MaxValueValidator(MAX_SCORE)
         ))
 
     class Meta:
