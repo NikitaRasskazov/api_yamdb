@@ -24,7 +24,6 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework_simplejwt',
     'api.apps.ApiConfig',
-    'yamdb.apps.YamdbConfig',
     'reviews.apps.ReviewsConfig',
     'rest_framework',
     'django_filters',
