@@ -10,6 +10,8 @@ class IsAdmin(permissions.BasePermission):
 
 
 class IsAdminOrReadOnly(permissions.BasePermission):
+    message = 'Необходимы права администратора'
+
     def has_permission(self, request, view):
         return (
             request.method in permissions.SAFE_METHODS

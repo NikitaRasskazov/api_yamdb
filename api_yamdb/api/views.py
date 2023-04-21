@@ -1,30 +1,33 @@
-from django_filters.rest_framework import (
-    DjangoFilterBackend, FilterSet, CharFilter, NumberFilter
-)
-from rest_framework import viewsets, status, filters
-from rest_framework.response import Response
-from rest_framework.filters import SearchFilter
-from rest_framework.pagination import PageNumberPagination
-from rest_framework.decorators import action
-from rest_framework.permissions import IsAuthenticated
-from rest_framework.views import APIView
-from django.shortcuts import get_object_or_404
 from django.db.models import Avg
+from django_filters.rest_framework import (
+    CharFilter,
+    DjangoFilterBackend,
+    FilterSet,
+    NumberFilter,
+)
+from django.shortcuts import get_object_or_404
 
-from reviews.models import Category, Genre, Title, Review, User
+from rest_framework import filters, status, viewsets
+from rest_framework.decorators import action
+from rest_framework.pagination import PageNumberPagination
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+
+from reviews.models import Category, Genre, Review, Title, User
+from .permissions import IsAdmin, IsAdminOrModerOrAuthor, IsAdminOrReadOnly
 from .serializers import (
     CategorySerializer,
-    GenreSerializer,
-    TitleSerializer,
-    TitleCreateSerializer,
     CommentSerializer,
+    GenreSerializer,
     ReviewSerializer,
-    UserSignupSerializer,
+    TitleCreateSerializer,
+    TitleSerializer,
     UserSerializer,
-    UserTokenSerializer
+    UserSignupSerializer,
+    UserTokenSerializer,
 )
 from .mixins import CustomViewSet
-from .permissions import IsAdminOrReadOnly, IsAdminOrModerOrAuthor, IsAdmin
 
 
 class UserSignupView(APIView):
@@ -93,21 +96,11 @@ class UserViewSet(viewsets.ModelViewSet):
 class CategoryViewSet(CustomViewSet):
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    pagination_class = PageNumberPagination
-    filter_backends = (SearchFilter, )
-    search_fields = ('name', )
-    lookup_field = 'slug'
-    permission_classes = (IsAdminOrReadOnly, )
 
 
 class GenreViewSet(CustomViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
-    pagination_class = PageNumberPagination
-    filter_backends = (SearchFilter, )
-    search_fields = ('name', )
-    lookup_field = 'slug'
-    permission_classes = (IsAdminOrReadOnly, )
 
 
 class TitleFilterSet(FilterSet):
