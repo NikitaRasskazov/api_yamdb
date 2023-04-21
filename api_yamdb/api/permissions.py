@@ -10,6 +10,7 @@ class IsAdmin(permissions.BasePermission):
 
 
 class IsAdminOrReadOnly(permissions.BasePermission):
+    """Проверка прав администратора."""
     message = 'Необходимы права администратора'
 
     def has_permission(self, request, view):
@@ -20,6 +21,7 @@ class IsAdminOrReadOnly(permissions.BasePermission):
 
 
 class IsAdminOrModerOrAuthor(permissions.BasePermission):
+    """Проверка прав администратора, модератора или админа"""
     message = 'Нет нужных прав, необходимо быть автором, админом, модератором'
 
     def has_permission(self, request, view):
