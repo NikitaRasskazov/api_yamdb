@@ -1,11 +1,9 @@
-from rest_framework import serializers, validators
+from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import ValidationError
-from django.db.models import Q
 from django.contrib.auth.tokens import default_token_generator
-from django.core.exceptions import ObjectDoesNotExist
 from django.core.mail import send_mail
 
 from reviews.models import (
@@ -20,6 +18,8 @@ from reviews.models import (
     MAX_SCORE,
     MAX_LENGTH_USERNAME,
 )
+from .validators import validate_username
+
 
 MAX_LENGTH_EMAIL = 254
 
@@ -35,13 +35,9 @@ class UserSerializer(serializers.ModelSerializer):
         max_length=MAX_LENGTH_USERNAME,
         required=False
     )
-    username = serializers.RegexField(
+    username = serializers.CharField(
         max_length=MAX_LENGTH_USERNAME,
-        regex=r'^[\w.@+-]+$',
-        error_messages={
-            'invalid': 'Это имя пользователя может содержать'
-                       'только буквы, цифры и символы @.+-_'
-        }
+        validators=[validate_username]
     )
 
     class Meta:
@@ -54,31 +50,25 @@ class UserSerializer(serializers.ModelSerializer):
             'role'
         )
         model = User
-        validators = [
-            validators.UniqueTogetherValidator(
-                queryset=User.objects.all(),
-                fields=['username']
+
+    def validate_username(self, username):
+        if User.objects.filter(username=username).exists():
+            raise ValidationError(
+                'Пользователь с таким именем уже существует.'
             )
-        ]
+        return username
 
 
 class UserSignupSerializer(serializers.Serializer):
     """Сериализатор для регистрации пользователя."""
     email = serializers.EmailField(max_length=MAX_LENGTH_EMAIL)
-    username = serializers.RegexField(
+    username = serializers.CharField(
         max_length=MAX_LENGTH_USERNAME,
-        regex=r'^[\w.@+-]+$',
-        error_messages={
-            'invalid': 'Это имя пользователя может содержать'
-                       'только буквы, цифры'
-                       'и символы @.+-_'
-        }
+        validators=[validate_username]
     )
 
-    def validate(self, data):
-
-        email = data['email']
-        username = data['username']
+    def validate_email(self, email):
+        username = self.initial_data.get('username')
         if (
             User.objects.filter(email=email).exists()
             and not User.objects.filter(username=username).exists()
@@ -90,30 +80,33 @@ class UserSignupSerializer(serializers.Serializer):
         if User.objects.filter(username=username).exists():
             user = User.objects.get(username=username)
             if email != user.email:
-                raise serializers.ValidationError('Указан неверный email.')
+                raise serializers.ValidationError(
+                    'Указан неверный email.'
+                )
 
-        if username != 'me':
-            return data
-        raise serializers.ValidationError(
-            'Имя "me" недоступно для применения.'
-        )
+        return email
+
+    def validate_username(self, username):
+        if username == 'me':
+            raise serializers.ValidationError(
+                'Имя "me" недоступно для применения.'
+            )
+        return username
 
     def create(self, validated_data):
-        try:
-            user = User.objects.get(
-                Q(email=validated_data['email'])
-                | Q(username=validated_data['username'])
-            )
-        except ObjectDoesNotExist:
-            user = User.objects.create(
-                email=validated_data['email'],
-                username=validated_data['username'],
-                is_active=False
-            )
+        user, created = User.objects.get_or_create(
+            email=validated_data['email'],
+            defaults={
+                'username': validated_data['username'],
+                'is_active': False,
+            },
+        )
         confirmation_code = default_token_generator.make_token(user)
         subject = 'Подтверждение email-адреса'
-        message = (f'Пожалуйста, используйте этот код подтверждения для '
-                   f'активации вашей учетной записи: {confirmation_code}')
+        message = (
+            f'Пожалуйста, используйте этот код подтверждения для '
+            f'активации вашей учетной записи: {confirmation_code}'
+        )
         send_mail(
             subject=subject,
             message=message,
