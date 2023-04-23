@@ -1,6 +1,7 @@
+from datetime import datetime
+
 from rest_framework import serializers, validators
 from rest_framework_simplejwt.tokens import RefreshToken
-
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.shortcuts import get_object_or_404
 from django.core.exceptions import ValidationError
@@ -23,6 +24,7 @@ from reviews.models import (
 )
 
 MAX_LENGTH_EMAIL = 254
+START_YEAR = 1
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -152,18 +154,24 @@ class UserTokenSerializer(serializers.Serializer):
 
 
 class CategorySerializer(serializers.ModelSerializer):
+    """Сериализатор модели Category."""
+
     class Meta:
         model = Category
         exclude = ('id', )
 
 
 class GenreSerializer(serializers.ModelSerializer):
+    """Сериализатор модели Genre."""
+
     class Meta:
         model = Genre
         exclude = ('id', )
 
 
 class TitleSerializer(serializers.ModelSerializer):
+    """Сериализатор модели Title."""
+
     genre = GenreSerializer(many=True)
     category = CategorySerializer()
     rating = serializers.IntegerField(read_only=True)
@@ -174,6 +182,8 @@ class TitleSerializer(serializers.ModelSerializer):
 
 
 class TitleCreateSerializer(serializers.ModelSerializer):
+    """Сериализато для создания объекта модели Title."""
+
     genre = serializers.SlugRelatedField(
         many=True,
         queryset=Genre.objects.all(),
@@ -187,6 +197,19 @@ class TitleCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Title
         fields = '__all__'
+
+    def validate_year(self, year):
+        """Валидатор поля year."""
+        current_year = datetime.now().year
+        if year < START_YEAR:
+            raise serializers.ValidationError(
+                'Год должен быть натуральным числом'
+            )
+        elif year > current_year:
+            raise serializers.ValidationError(
+                'Год не может быть больше текущего'
+            )
+        return year
 
 
 class ReviewSerializer(serializers.ModelSerializer):
