@@ -6,7 +6,6 @@ from django_filters.rest_framework import (
     NumberFilter,
 )
 from django.shortcuts import get_object_or_404
-
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination

@@ -11,7 +11,9 @@ def validate_username(value):
 
     regex_validator = RegexValidator(
         regex=r'^[\w.@+-]+$',
-        message='Это имя пользователя может содержать '
-                'только буквы, цифры и символы @.+-_'
+        message=(
+            'Это имя пользователя может содержать '
+            'только буквы, цифры и символы @.+-_'
+        )
     )
     regex_validator(value)

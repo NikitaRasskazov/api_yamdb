@@ -18,7 +18,7 @@ from reviews.models import (
     MAX_SCORE,
     MAX_LENGTH_USERNAME,
 )
-from .validators import validate_username
+from validators import validate_username
 
 
 MAX_LENGTH_EMAIL = 254
@@ -104,7 +104,7 @@ class UserSignupSerializer(serializers.Serializer):
         confirmation_code = default_token_generator.make_token(user)
         subject = 'Подтверждение email-адреса'
         message = (
-            f'Пожалуйста, используйте этот код подтверждения для '
+            'Пожалуйста, используйте этот код подтверждения для '
             f'активации вашей учетной записи: {confirmation_code}'
         )
         send_mail(
