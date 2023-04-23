@@ -30,9 +30,12 @@ from .mixins import CustomViewSet
 
 
 class UserSignupView(APIView):
+    """Вьюсет для регистрации пользователя."""
+
     serializer_class = UserSignupSerializer
 
     def post(self, request):
+        """Регистрация пользователя."""
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save()
@@ -40,16 +43,19 @@ class UserSignupView(APIView):
 
 
 class UserTokenView(APIView):
+    """Вьюсет для получения токена авторизации."""
+
     serializer_class = UserTokenSerializer
 
     def post(self, request):
+        """Создание токена для авторизации пользователя."""
         serializer = self.serializer_class(data=request.data)
         serializer.is_valid(raise_exception=True)
         return Response({'token': serializer.validated_data['token']})
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    """Вьюсет для пользователей."""
+    """Вьюсет для управления пользователями."""
 
     queryset = User.objects.all()
     serializer_class = UserSerializer
@@ -65,6 +71,7 @@ class UserViewSet(viewsets.ModelViewSet):
         permission_classes=[IsAuthenticated]
     )
     def me(self, request):
+        """Возврат или редактирование данных пользователя."""
         serializer = self.get_serializer_class()
         user = get_object_or_404(User, username=request.user.username)
         if self.request.method == 'PATCH':
@@ -84,6 +91,7 @@ class UserViewSet(viewsets.ModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def destroy(self, request, pk=None, *args, **kwargs):
+        """Удаление пользователя."""
         if pk == 'me':
             user = request.user
         else:

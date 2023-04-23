@@ -24,6 +24,8 @@ ROLE_CHOICES = [
 
 
 class User(AbstractUser):
+    """Модель пользователя."""
+
     bio = models.TextField(
         verbose_name='Биография',
         blank=True
@@ -54,10 +56,15 @@ class User(AbstractUser):
 
     @property
     def is_admin(self):
+        """
+        Проверка является ли пользователь
+        администратором или суперюзером.
+        """
         return self.is_superuser or self.role == "admin"
 
     @property
     def is_moder(self):
+        """Проверка является ли пользователь модератором."""
         return self.role == 'moderator'
 
 
