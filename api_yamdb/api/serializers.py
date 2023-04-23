@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from rest_framework import serializers, validators
+from rest_framework import serializers
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.shortcuts import get_object_or_404
@@ -29,6 +29,7 @@ START_YEAR = 1
 
 class UserSerializer(serializers.ModelSerializer):
     """Сериализатор для управления пользователями."""
+
     role = serializers.ChoiceField(
         choices=ROLE_CHOICES,
         default='user',
@@ -55,6 +56,7 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
 
     def validate_username(self, username):
+        """Валидация имени пользователя."""
         if User.objects.filter(username=username).exists():
             raise ValidationError(
                 'Пользователь с таким именем уже существует.'
@@ -64,6 +66,7 @@ class UserSerializer(serializers.ModelSerializer):
 
 class UserSignupSerializer(serializers.Serializer):
     """Сериализатор для регистрации пользователя."""
+
     email = serializers.EmailField(max_length=MAX_LENGTH_EMAIL)
     username = serializers.CharField(
         max_length=MAX_LENGTH_USERNAME,
@@ -71,6 +74,7 @@ class UserSignupSerializer(serializers.Serializer):
     )
 
     def validate_email(self, email):
+        """Валидация email пользователя."""
         username = self.initial_data.get('username')
         if (
             User.objects.filter(email=email).exists()
@@ -90,6 +94,7 @@ class UserSignupSerializer(serializers.Serializer):
         return email
 
     def validate_username(self, username):
+        """Валидация имени пользователя."""
         if username == 'me':
             raise serializers.ValidationError(
                 'Имя "me" недоступно для применения.'
@@ -97,6 +102,7 @@ class UserSignupSerializer(serializers.Serializer):
         return username
 
     def create(self, validated_data):
+        """Регистрация пользователя."""
         user, created = User.objects.get_or_create(
             email=validated_data['email'],
             defaults={
@@ -122,10 +128,15 @@ class UserSignupSerializer(serializers.Serializer):
 
 class UserTokenSerializer(serializers.Serializer):
     """Сериализатор для подтверждения email-адреса."""
+
     username = serializers.CharField(max_length=MAX_LENGTH_USERNAME)
     confirmation_code = serializers.CharField()
 
     def validate(self, attrs):
+        """
+        Проверка на существование пользователя,
+        а также корректности кода верификации.
+        """
         username = attrs.get('username')
         confirmation_code = attrs.get('confirmation_code')
 
