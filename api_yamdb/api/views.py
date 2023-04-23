@@ -93,16 +93,22 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class CategoryViewSet(CustomViewSet):
+    """Вьюсет для категорий."""
+
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
 
 class GenreViewSet(CustomViewSet):
+    """Вьюсет для жанров."""
+
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
 
 
 class TitleFilterSet(FilterSet):
+    """Фильтрация для произведений."""
+
     genre = CharFilter(field_name='genre__slug')
     category = CharFilter(field_name='category__slug')
     name = CharFilter()
@@ -114,6 +120,8 @@ class TitleFilterSet(FilterSet):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
+    """Вьюсет для произведений."""
+
     queryset = Title.objects.annotate(
         rating=Avg('reviews__score')
     ).all()
@@ -123,12 +131,14 @@ class TitleViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminOrReadOnly, )
 
     def get_serializer_class(self):
+        """Определяет сериализатор для произведений."""
         if self.action in ('create', 'update', 'partial_update'):
             return TitleCreateSerializer
         return TitleSerializer
 
 
 class ReviewViewSet(viewsets.ModelViewSet):
+    """Вьюсет для отзывов."""
     serializer_class = ReviewSerializer
     permission_classes = (IsAdminOrModerOrAuthor,)
     pagination_class = PageNumberPagination
@@ -147,6 +157,7 @@ class ReviewViewSet(viewsets.ModelViewSet):
 
 
 class CommentViewSet(viewsets.ModelViewSet):
+    """Вьюсет для комментриев."""
     serializer_class = CommentSerializer
     permission_classes = (IsAdminOrModerOrAuthor,)
 

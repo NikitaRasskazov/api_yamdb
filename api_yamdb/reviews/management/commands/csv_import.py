@@ -8,9 +8,10 @@ from reviews.models import (
 
 
 class Command(BaseCommand):
-    help = "Импортирует данные из csv-файлов"
+    """Импортирует данные из csv файлов в базу данных."""
 
     def category_import(self):
+        """Импортирует данные категорий."""
         if Category.objects.exists():
             self.stdout.write('Данные уже существуют в Category')
         else:
@@ -25,6 +26,7 @@ class Command(BaseCommand):
                 self.stdout.write(f'Category"{category}" создан')
 
     def genre_import(self):
+        """Импортирует данные жанров."""
         if Genre.objects.exists():
             self.stdout.write('Данные уже существуют в Genre')
         else:
@@ -39,6 +41,7 @@ class Command(BaseCommand):
                 self.stdout.write(f'Genre "{genre}" создан')
 
     def title_import(self):
+        """Импортирует данные произведений."""
         if Title.objects.exists():
             self.stdout.write('Данные уже существуют в Title')
         else:
@@ -55,6 +58,7 @@ class Command(BaseCommand):
                 self.stdout.write(f'Title "{title}" создан')
 
     def genre_title_import(self):
+        """Импортирует данные для GenreTitle."""
         if GenreTitle.objects.exists():
             self.stdout.write('Данные уже существуют в GenreTitle')
         else:
@@ -71,6 +75,7 @@ class Command(BaseCommand):
                 self.stdout.write(f'GenreTitle "{genre_title}" создан')
 
     def user_import(self):
+        """Импортирует данные пользователей."""
         if User.objects.exists():
             self.stdout.write('Данные уже существуют в User')
         else:
@@ -89,6 +94,7 @@ class Command(BaseCommand):
                 self.stdout.write(f'User "{user}" создан')
 
     def review_import(self):
+        """Импортирует данные отзывов."""
         if Review.objects.exists():
             self.stdout.write('Данные уже существуют в Review')
         else:
@@ -107,6 +113,7 @@ class Command(BaseCommand):
                 self.stdout.write(f'Review "{review}" создан')
 
     def comment_import(self):
+        """Импортирует данные комментариев."""
         if Comment.objects.exists():
             self.stdout.write('Данные уже существуют в Comment')
         else:
@@ -124,6 +131,7 @@ class Command(BaseCommand):
                 self.stdout.write(f'Comment "{comment}" создан')
 
     def handle(self, *args, **kwargs):
+        """Выполняет запуск импорта для всех моделей."""
         self.user_import()
         self.category_import()
         self.genre_import()
