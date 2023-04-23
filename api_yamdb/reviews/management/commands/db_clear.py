@@ -6,7 +6,7 @@ from reviews.models import (
 
 
 class Command(BaseCommand):
-    help = 'Удаляет данные в бд'
+    """Удаляет все данные в базе данных."""
 
     def handle(self, *args, **options):
         Category.objects.all().delete()
