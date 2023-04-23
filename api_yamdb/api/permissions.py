@@ -3,6 +3,8 @@ from rest_framework import permissions
 
 class IsAdmin(permissions.BasePermission):
     """Проверка роли администратора."""
+    message = 'Необходимы права администратора'
+
     def has_permission(self, request, view):
 
         user = request.user

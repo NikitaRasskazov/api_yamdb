@@ -4,6 +4,8 @@ from django.db import models
 from django.core.validators import MaxValueValidator, MinValueValidator
 from django.contrib.auth.models import AbstractUser
 
+from validators import validate_username
+
 LEN_STR_TEXT = 20
 MAX_LENGTH_TEXT = 200
 MAX_LENGTH_NAME = 256
@@ -23,24 +25,29 @@ ROLE_CHOICES = [
 
 class User(AbstractUser):
     bio = models.TextField(
-        'Биография',
+        verbose_name='Биография',
         blank=True
     )
     username = models.CharField(
-        'Логин',
+        verbose_name='Логин',
         max_length=MAX_LENGTH_USERNAME,
         unique=True,
+        validators=[validate_username]
     )
     email = models.EmailField(
-        'Email',
+        verbose_name='Email',
         unique=True,
     )
     role = models.CharField(
-        'Роль',
+        verbose_name='Роль',
         max_length=MAX_LENGTH_ROLE,
         choices=ROLE_CHOICES,
         default='user',
     )
+
+    class Meta:
+        verbose_name = 'Пользователь'
+        verbose_name_plural = 'Пользователи'
 
     def __str__(self):
         return self.username
@@ -182,10 +189,14 @@ class Review(models.Model):
             MinValueValidator(MIN_SCORE),
             MaxValueValidator(MAX_SCORE)
         ),
-        error_messages={'validators': 'Поставьте оценку от 1 до 10!'}
+        error_messages={'validators':
+                        f'Поставьте оценку от {MIN_SCORE} до {MAX_SCORE}!'
+                        }
     )
 
     class Meta:
+        verbose_name = 'Отзыв'
+        verbose_name_plural = 'Отзывы'
         constraints = [
             models.UniqueConstraint(
                 fields=('title', 'author',),
@@ -212,6 +223,10 @@ class Comment(models.Model):
         on_delete=models.CASCADE,
         related_name='comments'
     )
+
+    class Meta:
+        verbose_name = 'Комментарий'
+        verbose_name_plural = 'Комментарии'
 
     def __str__(self):
         return self.text[:LEN_STR_TEXT]
