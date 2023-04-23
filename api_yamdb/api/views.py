@@ -6,7 +6,6 @@ from django_filters.rest_framework import (
     NumberFilter,
 )
 from django.shortcuts import get_object_or_404
-
 from rest_framework import filters, status, viewsets
 from rest_framework.decorators import action
 from rest_framework.pagination import PageNumberPagination
@@ -94,16 +93,22 @@ class UserViewSet(viewsets.ModelViewSet):
 
 
 class CategoryViewSet(CustomViewSet):
+    """Вьюсет для категорий."""
+
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
 
 
 class GenreViewSet(CustomViewSet):
+    """Вьюсет для жанров."""
+
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
 
 
 class TitleFilterSet(FilterSet):
+    """Фильтрация для произведений."""
+
     genre = CharFilter(field_name='genre__slug')
     category = CharFilter(field_name='category__slug')
     name = CharFilter()
@@ -115,6 +120,8 @@ class TitleFilterSet(FilterSet):
 
 
 class TitleViewSet(viewsets.ModelViewSet):
+    """Вьюсет для произведений."""
+
     queryset = Title.objects.annotate(
         rating=Avg('reviews__score')
     ).all()
@@ -124,6 +131,7 @@ class TitleViewSet(viewsets.ModelViewSet):
     permission_classes = (IsAdminOrReadOnly, )
 
     def get_serializer_class(self):
+        """Определяет сериализатор для произведений."""
         if self.action in ('create', 'update', 'partial_update'):
             return TitleCreateSerializer
         return TitleSerializer

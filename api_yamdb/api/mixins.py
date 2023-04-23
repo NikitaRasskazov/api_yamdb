@@ -10,6 +10,8 @@ class CustomViewSet(
     mixins.ListModelMixin,
     viewsets.GenericViewSet
 ):
+    """Вьюсет для жанров и категорий."""
+
     pagination_class = PageNumberPagination
     filter_backends = (filters.SearchFilter, )
     search_fields = ('name', )
@@ -17,4 +19,5 @@ class CustomViewSet(
     permission_classes = (IsAdminOrReadOnly, )
 
     def get_queryset(self):
+        """Возвращает все объекты модели данных."""
         return self.queryset.all()

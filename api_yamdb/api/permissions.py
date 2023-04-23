@@ -10,9 +10,16 @@ class IsAdmin(permissions.BasePermission):
 
 
 class IsAdminOrReadOnly(permissions.BasePermission):
+    """
+    Права доступа для проверки, является ли пользователь администратором.
+    Если пользователь не является администратором,
+    то ему разрешены только безопасные запросы (GET, HEAD, OPTIONS).
+    """
+
     message = 'Необходимы права администратора'
 
     def has_permission(self, request, view):
+        """Проверка наличия прав у пользователя на выполнение запроса."""
         return (
             request.method in permissions.SAFE_METHODS
             or (request.user.is_authenticated and request.user.is_admin)
