@@ -186,7 +186,7 @@ class TitleSerializer(serializers.ModelSerializer):
 
 
 class TitleCreateSerializer(serializers.ModelSerializer):
-    """Сериализато для создания объекта модели Title."""
+    """Сериализатор для создания объекта модели Title."""
 
     genre = serializers.SlugRelatedField(
         many=True,
@@ -234,6 +234,7 @@ class ReviewSerializer(serializers.ModelSerializer):
         read_only_fields = ('title', 'author')
 
     def validate(self, data):
+        """Валидируем уникальность отзыва."""
         request = self.context['request']
         author = request.user
         title_id = self.context.get('view').kwargs.get('title_id')
